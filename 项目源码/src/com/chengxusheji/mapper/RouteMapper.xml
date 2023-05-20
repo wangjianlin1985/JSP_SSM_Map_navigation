@@ -1,0 +1,50 @@
+﻿<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.RouteMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加路径记录 -->
+	<insert id="addRoute" parameterType="route">
+		insert into t_route(startScenic,endScenic) values 
+		(#{startScenic.scenicId},#{endScenic.scenicId})
+	</insert>
+
+	<!-- 按照查询条件分页查询路径记录 -->
+	<select id="queryRoute" resultMap="routeMap" >
+		select t_route.* from t_route,t_scenic ${where} and t_route.startScenic = t_scenic.scenicId and t_route.endScenic = t_scenic.scenicId limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="routeMap" type="route">
+        <id property="routeId" column="routeId" />
+        <association property="startScenic" column="startScenic" select="com.chengxusheji.mapper.ScenicMapper.getScenic" />
+        <association property="endScenic" column="endScenic" select="com.chengxusheji.mapper.ScenicMapper.getScenic" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有路径记录 -->
+	<select id="queryRouteList" resultMap="routeMap" >
+		select t_route.* from t_route,t_scenic ${where} and t_route.startScenic = t_scenic.scenicId and t_route.endScenic = t_scenic.scenicId
+	</select>
+
+    <!-- 按照查询条件的路径记录数 -->
+	<select id="queryRouteCount" resultType="int">
+		select count(*) from t_route,t_scenic ${where} and t_route.startScenic = t_scenic.scenicId and t_route.endScenic = t_scenic.scenicId
+	</select>
+
+	<!-- 根据主键查询某个路径记录 -->
+	<select id="getRoute" parameterType="int" resultMap="routeMap">
+		select * from t_route where t_route.routeId = #{routeId}
+	</select>
+
+	<!-- 更新路径记录 -->
+	<update id="updateRoute" parameterType="route">
+		update t_route set startScenic=#{startScenic.scenicId},endScenic=#{endScenic.scenicId} where routeId = #{routeId}
+	</update>
+
+	<!-- 删除路径记录 -->
+	<delete id="deleteRoute" parameterType="int">
+		delete from t_route where routeId=#{routeId}
+	</delete>
+
+</mapper>
